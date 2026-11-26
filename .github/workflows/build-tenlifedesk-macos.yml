@@ -81,8 +81,22 @@ jobs:
               f'pub const RS_PUB_KEY: &str = "{key}";',
               text,
           )
-          print(f"Patched config.rs: PROD_RENDEZVOUS_SERVER={n1}, APP_NAME={n2}, RENDEZVOUS_SERVERS={n3}, RS_PUB_KEY={n4}")
-          assert all(n == 1 for n in (n1, n2, n3, n4)), "Failed to patch one or more fields in config.rs"
+          default_settings_code = (
+              'pub static ref DEFAULT_SETTINGS: RwLock<HashMap<String, String>> = {\n'
+              '        let mut m = HashMap::new();\n'
+              f'        m.insert("custom-rendezvous-server".to_owned(), "{server}".to_owned());\n'
+              f'        m.insert("relay-server".to_owned(), "{server}".to_owned());\n'
+              f'        m.insert("key".to_owned(), "{key}".to_owned());\n'
+              '        RwLock::new(m)\n'
+              '    };'
+          )
+          text, n5 = re.subn(
+              r'pub static ref DEFAULT_SETTINGS: RwLock<HashMap<String, String>> = Default::default\(\);',
+              default_settings_code,
+              text,
+          )
+          print(f"Patched config.rs: PROD_RENDEZVOUS_SERVER={n1}, APP_NAME={n2}, RENDEZVOUS_SERVERS={n3}, RS_PUB_KEY={n4}, DEFAULT_SETTINGS={n5}")
+          assert all(n == 1 for n in (n1, n2, n3, n4, n5)), "Failed to patch one or more fields in config.rs"
           with open(path, "w", encoding="utf-8") as f:
               f.write(text)
 
