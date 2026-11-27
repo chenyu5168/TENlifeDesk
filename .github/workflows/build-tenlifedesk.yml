@@ -101,6 +101,21 @@ jobs:
               default_settings_code,
               text,
           )
+          default_display_code = (
+              'pub static ref DEFAULT_DISPLAY_SETTINGS: RwLock<HashMap<String, String>> = {\n'
+              '        let mut m = HashMap::new();\n'
+              '        m.insert("codec-preference".to_owned(), "h264".to_owned());\n'
+              '        m.insert("image_quality".to_owned(), "low".to_owned());\n'
+              '        m.insert("view_style".to_owned(), "adaptive".to_owned());\n'
+              '        m.insert("disable_audio".to_owned(), "Y".to_owned());\n'
+              '        RwLock::new(m)\n'
+              '    };'
+          )
+          text, n5b = re.subn(
+              r'pub static ref DEFAULT_DISPLAY_SETTINGS: RwLock<HashMap<String, String>> = Default::default\(\);',
+              default_display_code,
+              text,
+          )
           hard_settings_code = (
               'pub static ref HARD_SETTINGS: RwLock<HashMap<String, String>> = {\n'
               '        let mut m = HashMap::new();\n'
@@ -114,8 +129,8 @@ jobs:
               hard_settings_code,
               text,
           )
-          print(f"Patched config.rs: PROD_RENDEZVOUS_SERVER={n1}, APP_NAME={n2}, RENDEZVOUS_SERVERS={n3}, RS_PUB_KEY={n4}, DEFAULT_SETTINGS={n5}, HARD_SETTINGS={n6}")
-          assert all(n == 1 for n in (n1, n2, n3, n4, n5, n6)), "Failed to patch one or more fields in config.rs"
+          print(f"Patched config.rs: PROD_RENDEZVOUS_SERVER={n1}, APP_NAME={n2}, RENDEZVOUS_SERVERS={n3}, RS_PUB_KEY={n4}, DEFAULT_SETTINGS={n5}, DEFAULT_DISPLAY_SETTINGS={n5b}, HARD_SETTINGS={n6}")
+          assert all(n == 1 for n in (n1, n2, n3, n4, n5, n5b, n6)), "Failed to patch one or more fields in config.rs"
           with open(path, "w", encoding="utf-8") as f:
               f.write(text)
 
