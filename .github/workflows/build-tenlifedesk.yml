@@ -116,6 +116,18 @@ jobs:
               default_display_code,
               text,
           )
+          default_local_code = (
+              'pub static ref DEFAULT_LOCAL_SETTINGS: RwLock<HashMap<String, String>> = {\n'
+              '        let mut m = HashMap::new();\n'
+              '        m.insert("theme".to_owned(), "dark".to_owned());\n'
+              '        RwLock::new(m)\n'
+              '    };'
+          )
+          text, n5c = re.subn(
+              r'pub static ref DEFAULT_LOCAL_SETTINGS: RwLock<HashMap<String, String>> = Default::default\(\);',
+              default_local_code,
+              text,
+          )
           hard_settings_code = (
               'pub static ref HARD_SETTINGS: RwLock<HashMap<String, String>> = {\n'
               '        let mut m = HashMap::new();\n'
@@ -129,8 +141,8 @@ jobs:
               hard_settings_code,
               text,
           )
-          print(f"Patched config.rs: PROD_RENDEZVOUS_SERVER={n1}, APP_NAME={n2}, RENDEZVOUS_SERVERS={n3}, RS_PUB_KEY={n4}, DEFAULT_SETTINGS={n5}, DEFAULT_DISPLAY_SETTINGS={n5b}, HARD_SETTINGS={n6}")
-          assert all(n == 1 for n in (n1, n2, n3, n4, n5, n5b, n6)), "Failed to patch one or more fields in config.rs"
+          print(f"Patched config.rs: PROD_RENDEZVOUS_SERVER={n1}, APP_NAME={n2}, RENDEZVOUS_SERVERS={n3}, RS_PUB_KEY={n4}, DEFAULT_SETTINGS={n5}, DEFAULT_DISPLAY_SETTINGS={n5b}, DEFAULT_LOCAL_SETTINGS={n5c}, HARD_SETTINGS={n6}")
+          assert all(n == 1 for n in (n1, n2, n3, n4, n5, n5b, n5c, n6)), "Failed to patch one or more fields in config.rs"
           with open(path, "w", encoding="utf-8") as f:
               f.write(text)
 
